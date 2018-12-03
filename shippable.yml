@@ -1,0 +1,21 @@
+build:
+    pre_ci:
+        - docker build -t ros2-crosscompiler:latest - < Dockerfile_cc_for_arm
+    pre_ci_boot:
+        image_name: ros2-crosscompiler
+        image_tag: latest
+        pull: false
+        options: "-e HOME=/root -v /var/run/docker.sock:/var/run/docker.sock"
+    ci:
+        - pwd
+        - cd /root/cc_ws
+        - ls ./ros2_ws/src/ros2/cross_compile/sysroot
+        - ls ./qemu-user-static
+        - docker image ls
+        - docker build -t aarch64_ros2:latest -f /root/src/github.com/lmayencourt/cross_compile/sysroot/Dockerfile_ubuntu_prebuild .
+        - bash /root/src/github.com/lmayencourt/cross_compile/entry_point.sh
+        - echo "job done!"
+    on_success:
+        - echo "SUSCESS !"
+    on_failure:
+        - echo "FAIL !"
